@@ -38,7 +38,7 @@ namespace Luka.Backlace.Premonition
                 return;
             }
             // generate the name for this locked shader
-            string lockedShaderName = Helpers.GetLockedShaderName(settings.shaderNameType, settings.customShaderName, settings.randomNameLength);
+            string lockedShaderName = Naming.get_compact_name(settings.shaderNameType, settings.customShaderName, settings.randomNameLength);
             string sourceFileName = Path.GetFileNameWithoutExtension(sourceShaderPath);
             string lockedShaderPath = Path.GetDirectoryName(sourceMaterialPath) + "/" + settings.compactShaderFolder + "/" + sourceFileName + lockedShaderName + ".shader";
             // make the locked directory if it doesn't exist
@@ -60,8 +60,28 @@ namespace Luka.Backlace.Premonition
             }
             // grab all shader_feature/multi_compile directives activated in the material
             string[] activeKeywords = sourceMaterial.shaderKeywords;
-            shaderParts = Helpers.AddPreProcessorInfo(settings, sourceMaterial, activeKeywords, shaderParts);
-            // to-do
+            shaderParts = Markers.add_processor_info(settings, sourceMaterial, activeKeywords, shaderParts);
+            // optimise each pass individually by removing unused keywords, etc.
+            var optimisedPasses = new List<string>();
+            foreach(var pass in shaderParts.Passes)
+            {
+                string optimisedPass = PassOptimiser.bake_defines(pass, activeKeywords, settings);
+                optimisedPasses.Add(optimisedPass);
+            }
+            shaderParts.Passes = optimisedPasses;
+            // Now, let's put the whole beautiful shader back together.
+            StringBuilder finalShaderBuilder = new StringBuilder();
+            finalShaderBuilder.Append(shaderParts.PrePassContent);
+            foreach (var pass in shaderParts.Passes)
+            {
+                finalShaderBuilder.Append(pass);
+            }
+            finalShaderBuilder.Append(shaderParts.PostPassContent);
+
+            string finalShaderCode = finalShaderBuilder.ToString();
+            // And finally, we write our new masterpiece to a file.
+            File.WriteAllText(lockedShaderPath, finalShaderCode);
+            AssetDatabase.Refresh();
         }
 
         // testing

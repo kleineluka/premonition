@@ -12,8 +12,8 @@ namespace Luka.Backlace.Premonition
     public static class PassOptimiser
     {
         
-        // to do: replace keyword blacklist past by just calling settings.keywordBlacklist directly
-        public static string OptimisePass(string passCode, string[] activeKeywords, ProcessorSettings settings)
+        // bake the active shader keywords into #define directives, removing all other shader_feature/multi_compile pragmas
+        public static string bake_defines(string passCode, string[] activeKeywords, ProcessorSettings settings)
         {
             // avoid duplicates + quick lookups thru hashsets
             var processedLines = new List<string>();
@@ -62,24 +62,23 @@ namespace Luka.Backlace.Premonition
                     processedLines.Add(line);
                 }
             }
-            // now we need to reassemble the pass, injecting our new #defines in the right place
             var finalPassBuilder = new StringBuilder();
-            bool passBraceFound = false;
+            bool definesInjected = false; // only do this once per pass
             foreach (var processedLine in processedLines)
             {
                 finalPassBuilder.AppendLine(processedLine);
-                // put them right after the opening brace of the pass
-                if (!passBraceFound && processedLine.Trim().EndsWith("{"))
+                // inject them into the first CGPROGRAM/HLSLPROGRAM block we find
+                if (!definesInjected && (processedLine.Trim().ToUpper() == "CGPROGRAM" || processedLine.Trim().ToUpper() == "HLSLPROGRAM"))
                 {
-                    passBraceFound = true;
+                    definesInjected = true;
                     if (definesToAdd.Any())
                     {
-                        if (settings.addCompilerComments) finalPassBuilder.AppendLine("// --- Premonitions: Baked Keywords ---");
+                        if(settings.addCompilerComments) finalPassBuilder.AppendLine("    // --- Premonitions: Baked Keywords ---");
                         foreach (var def in definesToAdd.OrderBy(d => d))
                         {
-                            finalPassBuilder.AppendLine(def);
+                            finalPassBuilder.AppendLine($"    {def}");
                         }
-                        if (settings.addCompilerComments) finalPassBuilder.AppendLine("// ------------------------------------");
+                        if(settings.addCompilerComments) finalPassBuilder.AppendLine("    // ------------------------------------");
                     }
                 }
             }
