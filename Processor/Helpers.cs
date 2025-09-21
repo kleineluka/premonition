@@ -54,7 +54,7 @@ namespace Luka.Backlace.Premonition
             return lockedShaderName;
         }
 
-        public static ShaderParts AddPreProcessorInfo(CompilerSettings settings, Material sourceMaterial, string[] activeKeywords, ShaderParts shaderParts)
+        public static ShaderParts AddPreProcessorInfo(ProcessorSettings settings, Material sourceMaterial, string[] activeKeywords, ShaderParts shaderParts)
         {
             if (!settings.addCompilerComments || shaderParts == null) return shaderParts;
             var commentBlockBuilder = new StringBuilder();

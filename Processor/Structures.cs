@@ -21,7 +21,7 @@ namespace Luka.Backlace.Premonition
     }
 
     // settings to share between components of the pre-processor
-    public class CompilerSettings
+    public class ProcessorSettings
     {
         public ShaderNameType shaderNameType = ShaderNameType.Timestamp;
         public bool addCompilerComments = true;
@@ -37,7 +37,7 @@ namespace Luka.Backlace.Premonition
         public string customShaderName = "_CompactCustomNameExample";
         public string compactShaderFolder = "CompactShaders";
         public int randomNameLength = 16;
-        public CompilerSettings() { }
+        public ProcessorSettings() { }
     }
 
     // container for various parts of a shader

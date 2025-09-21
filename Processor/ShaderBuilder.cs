@@ -60,7 +60,7 @@ namespace Luka.Backlace.Premonition
         }
 
         // recursively process includes, keeping track of already processed files to avoid circular includes
-        private static string process_include_recursive(string filePath, HashSet<string> processedInThisChain, CompilerSettings settings)
+        private static string process_include_recursive(string filePath, HashSet<string> processedInThisChain, ProcessorSettings settings)
         {
             // first, check for circular includes
             string absolutePath = Path.GetFullPath(filePath);
@@ -113,7 +113,7 @@ namespace Luka.Backlace.Premonition
         }
 
         // wrapper to start the recursive processing of includes
-        public static string build_single_shader(string sourceShaderPath, CompilerSettings settings)
+        public static string build_single_shader(string sourceShaderPath, ProcessorSettings settings)
         {
             var finalShaderCode = new StringBuilder();
             if (settings.addCompilerComments) finalShaderCode.AppendLine($"// PREMONITIONS: Processing shader from {sourceShaderPath}");

@@ -5,7 +5,7 @@ Generate compact shaders for a material with one click! Stop Unity from compilin
 
 ## Supported Settings 🕯️
 
-Using Premonition requires passing a `CompilerSettings` object. This object contains the following settings:
+Using Premonition requires passing a `ProcessorSettings` object. This object contains the following settings:
 
 - `shaderNameType`: Determines how the new shader will be named. You can choose between `Timestamp`, `Custom`, or `Random`.
 - `addCompilerComments`: Adds comments about the compilation process to the generated shader.

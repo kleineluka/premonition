@@ -15,7 +15,7 @@ namespace Luka.Backlace.Premonition
     public static class Processor
     {
 
-        public static void lock_material(Material sourceMaterial, CompilerSettings settings)
+        public static void lock_material(Material sourceMaterial, ProcessorSettings settings)
         {
             // sanity checks
             if (sourceMaterial == null || sourceMaterial.shader == null)
@@ -75,7 +75,7 @@ namespace Luka.Backlace.Premonition
         private static void GenerateLockedShaderFromMenu()
         {
             Material material = Selection.activeObject as Material;
-            CompilerSettings settings = new CompilerSettings();
+            ProcessorSettings settings = new ProcessorSettings();
             lock_material(material, settings);
         }
     }
