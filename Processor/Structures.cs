@@ -37,7 +37,15 @@ namespace Luka.Backlace.Premonition
         public string customShaderName = "_CompactCustomNameExample";
         public string compactShaderFolder = "CompactShaders";
         public int randomNameLength = 16;
-        public ProcessorSettings() { }
+        public List<string> keywordBlacklist = new List<string>();
+        public ProcessorSettings() 
+        { 
+            //keywordBlacklist.Add("_"); // For shader_feature_local
+            keywordBlacklist.Add("VERTEXLIGHT_ON");
+            keywordBlacklist.Add("FOG_LINEAR");
+            keywordBlacklist.Add("FOG_EXP");
+            keywordBlacklist.Add("FOG_EXP2");
+        }
     }
 
     // container for various parts of a shader
