@@ -1,2 +1,2 @@
 # premonition
-A plug-and-play shader pre-processor. 
+Generate compact shaders for a material with one click! 
