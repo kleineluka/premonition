@@ -34,8 +34,8 @@ namespace Luka.Backlace.Premonition
         public bool trackErrors = true;
         public bool addLockedMarker = true;
         public bool preventReLocking = true;
-        public string customShaderName = "_LockedCustomNameExample";
-        public string lockedShaderFolder = "LockedShaders";
+        public string customShaderName = "_CompactCustomNameExample";
+        public string compactShaderFolder = "CompactShaders";
         public int randomNameLength = 16;
         public CompilerSettings() { }
     }

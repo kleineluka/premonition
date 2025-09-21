@@ -16,7 +16,7 @@ namespace Luka.Backlace.Premonition
     {
 
         // get the path of an include directive line, or null if not found
-        private static string ExtractIncludePath(string includeLine)
+        private static string extract_include_path(string includeLine)
         {
             int firstQuote = includeLine.IndexOf('"') + 1;
             int lastQuote = includeLine.LastIndexOf('"');
@@ -27,7 +27,7 @@ namespace Luka.Backlace.Premonition
         }
 
         // search for the include file in the project, return the path if found, otherwise null
-        private static string FindIncludeFile(string includeFileName, string searchDirectory)
+        private static string find_include_file(string includeFileName, string searchDirectory)
         {
             // check relative to current file first
             string relativePath = Path.GetFullPath(Path.Combine(searchDirectory, includeFileName));
@@ -60,7 +60,7 @@ namespace Luka.Backlace.Premonition
         }
 
         // recursively process includes, keeping track of already processed files to avoid circular includes
-        private static string ProcessIncludeRecursive(string filePath, HashSet<string> processedInThisChain, CompilerSettings settings)
+        private static string process_include_recursive(string filePath, HashSet<string> processedInThisChain, CompilerSettings settings)
         {
             // first, check for circular includes
             string absolutePath = Path.GetFullPath(filePath);
@@ -82,19 +82,19 @@ namespace Luka.Backlace.Premonition
                 string trimmedLine = line.Trim();
                 if (trimmedLine.StartsWith("#include"))
                 {
-                    string includePath = ExtractIncludePath(trimmedLine);
+                    string includePath = extract_include_path(trimmedLine);
                     if (string.IsNullOrEmpty(includePath))
                     {
                         stringBuilder.AppendLine(line);
                         continue;
                     }
                     // find the include file
-                    string includeAssetPath = FindIncludeFile(includePath, fileDirectory);
+                    string includeAssetPath = find_include_file(includePath, fileDirectory);
                     // if found, process it recursively
                     if (!string.IsNullOrEmpty(includeAssetPath))
                     {
                         if(settings.addCompilerComments) stringBuilder.AppendLine($"// PREMONITIONS: Inlining content from {includePath}\n// ----------------------------------------");
-                        stringBuilder.Append(ProcessIncludeRecursive(includeAssetPath, processedInThisChain, settings));
+                        stringBuilder.Append(process_include_recursive(includeAssetPath, processedInThisChain, settings));
                         if(settings.addCompilerComments) stringBuilder.AppendLine($"// ----------------------------------------\n// PREMONITIONS: End of inlined {includePath}");
                     }
                     else
@@ -113,7 +113,7 @@ namespace Luka.Backlace.Premonition
         }
 
         // wrapper to start the recursive processing of includes
-        public static string BuildSingleFileShader(string sourceShaderPath, CompilerSettings settings)
+        public static string build_single_shader(string sourceShaderPath, CompilerSettings settings)
         {
             var finalShaderCode = new StringBuilder();
             if (settings.addCompilerComments) finalShaderCode.AppendLine($"// PREMONITIONS: Processing shader from {sourceShaderPath}");
@@ -126,7 +126,7 @@ namespace Luka.Backlace.Premonition
                 string trimmedLine = (settings.optimizeWhitespace) ? line.Trim() : line;
                 if (trimmedLine.StartsWith("#include"))
                 {
-                    string includePath = ExtractIncludePath(trimmedLine);
+                    string includePath = extract_include_path(trimmedLine);
                     // if no path found, just copy the line as is
                     if (string.IsNullOrEmpty(includePath))
                     {
@@ -134,12 +134,12 @@ namespace Luka.Backlace.Premonition
                         continue;
                     }
                     // find the include file
-                    string includeAssetPath = FindIncludeFile(includePath, sourceDirectory);
+                    string includeAssetPath = find_include_file(includePath, sourceDirectory);
                     if (!string.IsNullOrEmpty(includeAssetPath))
                     {
                         // if found, process it recursively
                         if(settings.addCompilerComments) finalShaderCode.AppendLine($"// PREMONITIONS: Inlining content from {includePath}\n// ----------------------------------------");
-                        string inlinedContent = ProcessIncludeRecursive(includeAssetPath, new HashSet<string>(), settings);
+                        string inlinedContent = process_include_recursive(includeAssetPath, new HashSet<string>(), settings);
                         finalShaderCode.Append(inlinedContent);
                         if(settings.addCompilerComments) finalShaderCode.AppendLine($"// ----------------------------------------\n// PREMONITIONS: End of inlined {includePath}");
                     }

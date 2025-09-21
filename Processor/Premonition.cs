@@ -15,7 +15,7 @@ namespace Luka.Backlace.Premonition
     public static class Processor
     {
 
-        public static void LockMaterial(Material sourceMaterial, CompilerSettings settings)
+        public static void lock_material(Material sourceMaterial, CompilerSettings settings)
         {
             // sanity checks
             if (sourceMaterial == null || sourceMaterial.shader == null)
@@ -30,39 +30,38 @@ namespace Luka.Backlace.Premonition
                 Debug.LogError("Premonitions: Could not find the shader file for the material's shader.");
                 return;
             }
+            // get the path to the material file
+            string sourceMaterialPath = AssetDatabase.GetAssetPath(sourceMaterial);
+            if (string.IsNullOrEmpty(sourceMaterialPath))
+            {
+                Debug.LogError("Premonitions: Could not find the path for the source material.");
+                return;
+            }
             // generate the name for this locked shader
             string lockedShaderName = Helpers.GetLockedShaderName(settings.shaderNameType, settings.customShaderName, settings.randomNameLength);
             string sourceFileName = Path.GetFileNameWithoutExtension(sourceShaderPath);
-            string lockedShaderPath = Path.GetDirectoryName(sourceShaderPath) + "/" + settings.lockedShaderFolder + "/" + sourceFileName + lockedShaderName + ".shader";
+            string lockedShaderPath = Path.GetDirectoryName(sourceMaterialPath) + "/" + settings.compactShaderFolder + "/" + sourceFileName + lockedShaderName + ".shader";
             // make the locked directory if it doesn't exist
             string lockedDirectory = Path.GetDirectoryName(lockedShaderPath);
             if (!Directory.Exists(lockedDirectory)) Directory.CreateDirectory(lockedDirectory);
-            // FIRST STEP: take the shader and inline all its includes
-            string inlinedShaderCode = ShaderBuilder.BuildSingleFileShader(sourceShaderPath, settings);
+            // take the shader and inline all its includes
+            string inlinedShaderCode = ShaderBuilder.build_single_shader(sourceShaderPath, settings);
             if (string.IsNullOrEmpty(inlinedShaderCode))
             {
                 Debug.LogError("Premonitions: Failed to process the shader includes.");
                 return;
             }
-            // SECOND STEP: split each pass into its own string
-            ShaderParts shaderParts = ShaderParser.SplitShaderIntoParts(inlinedShaderCode);
-            // THIRD STEP: grab all shader_feature/multi_compile directives activated in the material
+            // split each pass into its own string
+            ShaderParts shaderParts = ShaderParser.split_shader_parts(inlinedShaderCode);
+            if (shaderParts == null || shaderParts.Passes.Count == 0)
+            {
+                Debug.LogError("Premonitions: Failed to parse the shader into passes.");
+                return;
+            }
+            // grab all shader_feature/multi_compile directives activated in the material
             string[] activeKeywords = sourceMaterial.shaderKeywords;
             shaderParts = Helpers.AddPreProcessorInfo(settings, sourceMaterial, activeKeywords, shaderParts);
-            // FOURTH STEP: for each pass, remove unused shader_features/multi_compiles
-
-
-
-            // FIFTH STEP: for each pass, remove those keyword declarations to prevent extra compiling after locking
-            // SIXTH STEP: for each pass, remove unused functions
-            // SEVENTH STEP: for each pass, remove unused variables
-            // EIGHTH STEP: for each pass, apply whitespace optimizations
-            // NINTH STEP: apply final optimizations (remove comments excluding PREMONITIONS comments actually this will have to go earlier, rename shader, etc)
-            // TENTH STEP: save the locked shader asset
-
-
-            
-
+            // to-do
         }
 
         // testing
@@ -77,7 +76,7 @@ namespace Luka.Backlace.Premonition
         {
             Material material = Selection.activeObject as Material;
             CompilerSettings settings = new CompilerSettings();
-            LockMaterial(material, settings);
+            lock_material(material, settings);
         }
     }
 

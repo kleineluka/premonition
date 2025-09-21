@@ -17,7 +17,7 @@ namespace Luka.Backlace.Premonition
     {
 
         // find the matching closing brace for a given opening brace index
-        private static int FindMatchingBrace(string code, int startIndex)
+        private static int find_matching_brace(string code, int startIndex)
         {
             if (startIndex < 0 || code[startIndex] != '{') return -1;
 
@@ -42,7 +42,7 @@ namespace Luka.Backlace.Premonition
         }
 
         // split shader code into pre-pass, passes, and post-pass sections
-        public static ShaderParts SplitShaderIntoParts(string shaderCode)
+        public static ShaderParts split_shader_parts(string shaderCode)
         {
             var parts = new ShaderParts();
             // find the SubShader block first
@@ -60,7 +60,7 @@ namespace Luka.Backlace.Premonition
                 return parts;
             }
             // find the matching closing brace for the SubShader block
-            int subShaderBraceClose = FindMatchingBrace(shaderCode, subShaderBraceOpen);
+            int subShaderBraceClose = find_matching_brace(shaderCode, subShaderBraceOpen);
             if (subShaderBraceClose == -1)
             {
                 parts.PrePassContent = shaderCode;
@@ -90,7 +90,7 @@ namespace Luka.Backlace.Premonition
                 }
                 // found a valid Pass block, now find its matching closing brace
                 int passBraceOpen = checkIndex;
-                int passBraceClose = FindMatchingBrace(subShaderContent, passBraceOpen);
+                int passBraceClose = find_matching_brace(subShaderContent, passBraceOpen);
                 if (passBraceClose != -1)
                 {
                     if (parts.Passes.Count == 0)
