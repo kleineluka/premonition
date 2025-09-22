@@ -29,6 +29,8 @@ namespace Luka.Backlace.Premonition
         public bool removeDeadFunctions = true;
         public bool removeDeadVariables = true;
         public bool optimizeWhitespace = true;
+        public bool removeEmptyLines = true;
+        public bool removePropertyAttributes = true;
         public bool randomiseGrabpass = true;
         public bool hideShaderName = true;
         public bool trackErrors = true;

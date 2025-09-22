@@ -51,6 +51,20 @@ namespace Luka.Backlace.Premonition
                 Debug.LogError("Premonitions: Failed to process the shader includes.");
                 return;
             }
+            // now perform the first wave of optimisations on the whole shader file (ex. remove empty lines)
+            if (settings.removeShaderComments) {
+                inlinedShaderCode = Cleaner.remove_comments(inlinedShaderCode);
+            }
+            if (settings.removePropertyAttributes) {
+                inlinedShaderCode = Cleaner.remove_header_attributes(inlinedShaderCode);
+                inlinedShaderCode = Cleaner.remove_space_attributes(inlinedShaderCode);
+            }
+            if (settings.removeEmptyLines) {
+                inlinedShaderCode = Cleaner.remove_empty_lines(inlinedShaderCode);
+            }
+            if (settings.optimizeWhitespace) {
+                inlinedShaderCode = Cleaner.optimise_whitespace(inlinedShaderCode);
+            }
             // split each pass into its own string
             ShaderParts shaderParts = ShaderParser.split_shader_parts(inlinedShaderCode);
             if (shaderParts == null || shaderParts.Passes.Count == 0)
@@ -58,6 +72,7 @@ namespace Luka.Backlace.Premonition
                 Debug.LogError("Premonitions: Failed to parse the shader into passes.");
                 return;
             }
+            // 
             // grab all shader_feature/multi_compile directives activated in the material
             string[] activeKeywords = sourceMaterial.shaderKeywords;
             shaderParts = Markers.add_processor_info(settings, sourceMaterial, activeKeywords, shaderParts);
@@ -69,7 +84,6 @@ namespace Luka.Backlace.Premonition
                 optimisedPasses.Add(optimisedPass);
             }
             shaderParts.Passes = optimisedPasses;
-            // Now, let's put the whole beautiful shader back together.
             StringBuilder finalShaderBuilder = new StringBuilder();
             finalShaderBuilder.Append(shaderParts.PrePassContent);
             foreach (var pass in shaderParts.Passes)
