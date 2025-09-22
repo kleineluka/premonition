@@ -88,17 +88,18 @@ namespace Luka.Backlace.Premonition
         }
     }
 
+    // WARNING: regex heavy..........
     public static class Cleaner
     {
         // remove all comments from shader code
-        public static string RemoveComments(string code)
+        public static string remove_comments(string code)
         {
             var re = @"(@(?:""[^""]*"")+|""(?:[^""\\]|\\.)*""|'(?:[^'\\]|\\.)*')|//.*|/\*(?s:.*?)\*/";
             return Regex.Replace(code, re, "$1");
         }
 
         // trim excess whitespace from shader code
-        public static string OptimizeWhitespace(string code)
+        public static string optimise_whitespace(string code)
         {
             // replace multiple spaces with a single space
             code = Regex.Replace(code, @"[ \t]+", " ");
@@ -118,9 +119,21 @@ namespace Luka.Backlace.Premonition
         }
 
         // remove all empty/whitespace-only lines from shader code
-        public static string RemoveEmptyLines(string code)
+        public static string remove_empty_lines(string code)
         {
             return System.Text.RegularExpressions.Regex.Replace(code, @"^\s*$\r?\n", string.Empty, System.Text.RegularExpressions.RegexOptions.Multiline);
+        }
+
+        // function to remove all the [Header(whatever goes here)] attributes from the shader code in properties block
+        public static string remove_header_attributes(string code)
+        {
+            return Regex.Replace(code, @"\[Header\((.*?)\)\]", string.Empty);
+        }
+
+        // function to remove all the [Space(whatever goes here)] attributes from the shader code in properties block
+        public static string remove_space_attributes(string code)
+        {
+            return Regex.Replace(code, @"\[Space\((.*?)\)\]", string.Empty);
         }
     }
 
