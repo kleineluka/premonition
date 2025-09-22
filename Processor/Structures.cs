@@ -37,14 +37,23 @@ namespace Luka.Backlace.Premonition
         public string customShaderName = "_CompactCustomNameExample";
         public string compactShaderFolder = "CompactShaders";
         public int randomNameLength = 16;
-        public List<string> keywordBlacklist = new List<string>();
+        public List<string> ignoreIncludes = new List<string>();
+        public List<string> ignoreKeywords = new List<string>();
         public ProcessorSettings() 
         { 
-            //keywordBlacklist.Add("_"); // For shader_feature_local
-            keywordBlacklist.Add("VERTEXLIGHT_ON");
-            keywordBlacklist.Add("FOG_LINEAR");
-            keywordBlacklist.Add("FOG_EXP");
-            keywordBlacklist.Add("FOG_EXP2");
+            // default ignored includes
+            ignoreIncludes.Add("UnityCG.cginc");
+            ignoreIncludes.Add("AutoLight.cginc");
+            ignoreIncludes.Add("Lighting.cginc");
+            ignoreIncludes.Add("HLSLSupport.cginc");
+            ignoreIncludes.Add("UnityShaderVariables.cginc");
+            ignoreIncludes.Add("TerrainEngine.cginc");
+            // default ignored keywords
+            //ignoreKeywords.Add("_"); // For shader_feature_local
+            ignoreKeywords.Add("VERTEXLIGHT_ON");
+            ignoreKeywords.Add("FOG_LINEAR");
+            ignoreKeywords.Add("FOG_EXP");
+            ignoreKeywords.Add("FOG_EXP2");
         }
     }
 

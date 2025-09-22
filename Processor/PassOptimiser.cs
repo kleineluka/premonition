@@ -19,7 +19,7 @@ namespace Luka.Backlace.Premonition
             var processedLines = new List<string>();
             var definesToAdd = new HashSet<string>();
             var activeKeywordsSet = new HashSet<string>(activeKeywords);
-            var blacklistSet = new HashSet<string>(settings.keywordBlacklist);
+            var blacklistSet = new HashSet<string>(settings.ignoreKeywords);
             // go through each line
             string[] lines = passCode.Split(new[] { "\r\n", "\r", "\n" }, System.StringSplitOptions.None);
             foreach (var line in lines)

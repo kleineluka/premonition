@@ -51,11 +51,6 @@ namespace Luka.Backlace.Premonition
                     return path;
                 }
             }
-            // ignore built-in includes (ex. "UnityCG.cginc")
-            if(File.Exists(EditorApplication.applicationContentsPath + "/CGIncludes/" + includeFileName))
-            {
-                return null;
-            }
             return null;
         }
 
@@ -84,6 +79,12 @@ namespace Luka.Backlace.Premonition
                 {
                     string includePath = extract_include_path(trimmedLine);
                     if (string.IsNullOrEmpty(includePath))
+                    {
+                        stringBuilder.AppendLine(line);
+                        continue;
+                    }
+                    // if it's a default include we want to ignore, just copy the line as is
+                    if (settings.ignoreIncludes.Contains(includePath))
                     {
                         stringBuilder.AppendLine(line);
                         continue;
@@ -129,6 +130,12 @@ namespace Luka.Backlace.Premonition
                     string includePath = extract_include_path(trimmedLine);
                     // if no path found, just copy the line as is
                     if (string.IsNullOrEmpty(includePath))
+                    {
+                        finalShaderCode.AppendLine(line);
+                        continue;
+                    }
+                    // if it's a default include we want to ignore, just copy the line as is
+                    if (settings.ignoreIncludes.Contains(includePath))
                     {
                         finalShaderCode.AppendLine(line);
                         continue;
