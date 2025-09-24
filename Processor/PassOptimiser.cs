@@ -73,12 +73,12 @@ namespace Luka.Backlace.Premonition
                     definesInjected = true;
                     if (definesToAdd.Any())
                     {
-                        if(settings.addCompilerComments) finalPassBuilder.AppendLine("    // --- Premonitions: Baked Keywords ---");
+                        if(settings.addCompilerComments) finalPassBuilder.AppendLine("// --- Premonitions: Baked Keywords ---");
                         foreach (var def in definesToAdd.OrderBy(d => d))
                         {
-                            finalPassBuilder.AppendLine($"    {def}");
+                            finalPassBuilder.AppendLine($"{def}");
                         }
-                        if(settings.addCompilerComments) finalPassBuilder.AppendLine("    // ------------------------------------");
+                        if(settings.addCompilerComments) finalPassBuilder.AppendLine("// ------------------------------------");
                     }
                 }
             }

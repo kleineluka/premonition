@@ -15,42 +15,30 @@ namespace Luka.Backlace.Premonition
     public static class Processor
     {
 
-        public enum LockResult
-        {
-            Success,
-            AlreadyLocked,
-            ErrorInliningIncludes,
-            ErrorSplittingShader,
-            InvalidMaterial,
-            InvalidShader,
-            ShaderNotFound,
-            MaterialNotFound
-        }
-
-        public static LockedResult lock_material(Material sourceMaterial, ProcessorSettings settings)
+        public static CompactResultData compact_material(Material sourceMaterial, ProcessorSettings settings)
         {
             // sanity checks
             if (sourceMaterial == null) {
                 Debug.LogError("Premonitions: Source material is null.");
-                return LockedResult.InvalidMaterial;
+                return new CompactResultData { Result = CompactResult.InvalidMaterial };
             }
             if (sourceMaterial.shader == null) {
                 Debug.LogError("Premonitions: Source material has no shader assigned.");
-                return LockedResult.InvalidShader;
+                return new CompactResultData { Result = CompactResult.InvalidShader };
             }
             // get the path to the shader file
             string sourceShaderPath = AssetDatabase.GetAssetPath(sourceMaterial.shader);
             if (string.IsNullOrEmpty(sourceShaderPath) || !sourceShaderPath.EndsWith(".shader"))
             {
                 Debug.LogError("Premonitions: Could not find the shader file for the material's shader.");
-                return LockedResult.ShaderNotFound;
+                return new CompactResultData { Result = CompactResult.ShaderNotFound };
             }
             // get the path to the material file
             string sourceMaterialPath = AssetDatabase.GetAssetPath(sourceMaterial);
             if (string.IsNullOrEmpty(sourceMaterialPath))
             {
                 Debug.LogError("Premonitions: Could not find the path for the source material.");
-                return LockedResult.MaterialNotFound;
+                return new CompactResultData { Result = CompactResult.MaterialNotFound };
             }
             // generate the name for this locked shader
             string lockedShaderName = Naming.get_compact_name(settings.shaderNameType, settings.customShaderName, settings.randomNameLength);
@@ -61,7 +49,7 @@ namespace Luka.Backlace.Premonition
                 string sourceShaderCode = File.ReadAllText(sourceShaderPath);
                 if (Markers.is_marked(sourceShaderCode)) {
                     Debug.LogWarning("Premonitions: The shader appears to have already been processed. Skipping re-locking.");
-                    return LockedResult.AlreadyLocked;
+                    return new CompactResultData { Result = CompactResult.AlreadyLocked };
                 }
             }
             // make the locked directory if it doesn't exist
@@ -72,26 +60,31 @@ namespace Luka.Backlace.Premonition
             if (string.IsNullOrEmpty(inlinedShaderCode))
             {
                 Debug.LogError("Premonitions: Failed to process the shader includes.");
-                return LockedResult.ErrorInliningIncludes;
+                return new CompactResultData { Result = CompactResult.ErrorInliningIncludes };
             }
             // change shader name
             inlinedShaderCode = Cleaner.rename_shader(inlinedShaderCode, lockedShaderName, settings.hideShaderName);
             // now perform the first wave of optimisations on the whole shader file (ex. remove empty lines)
-            if (settings.removeShaderComments) {
+            if (settings.removeShaderComments) 
+            {
                 inlinedShaderCode = Cleaner.remove_comments(inlinedShaderCode);
             }
-            if (settings.removePropertyAttributes) {
+            if (settings.removePropertyAttributes) 
+            {
                 inlinedShaderCode = Cleaner.remove_header_attributes(inlinedShaderCode);
                 inlinedShaderCode = Cleaner.remove_space_attributes(inlinedShaderCode);
             }
-            if (settings.removeEmptyLines) {
+            if (settings.removeEmptyLines) 
+            {
                 inlinedShaderCode = Cleaner.remove_empty_lines(inlinedShaderCode);
             }
-            if (settings.optimizeWhitespace) {
+            if (settings.optimizeWhitespace) 
+            {
                 inlinedShaderCode = Cleaner.optimise_whitespace(inlinedShaderCode);
             }
             // randomise grabpass names
-            if (settings.randomiseGrabpass) {
+            if (settings.randomiseGrabpass) 
+            {
                 inlinedShaderCode = Cleaner.randomise_grabpass_names(inlinedShaderCode, settings);
             }
             // split each pass into its own string
@@ -99,7 +92,7 @@ namespace Luka.Backlace.Premonition
             if (shaderParts == null || shaderParts.Passes.Count == 0)
             {
                 Debug.LogError("Premonitions: Failed to parse the shader into passes.");
-                return LockedResult.ErrorSplittingShader;
+                return new CompactResultData { Result = CompactResult.ErrorSplittingShader };
             }
             // 
             // grab all shader_feature/multi_compile directives activated in the material
@@ -109,7 +102,11 @@ namespace Luka.Backlace.Premonition
             var optimisedPasses = new List<string>();
             foreach(var pass in shaderParts.Passes)
             {
-                string optimisedPass = PassOptimiser.bake_defines(pass, activeKeywords, settings);
+                string optimisedPass = pass;
+                if (settings.bakeDefines) 
+                {
+                    optimisedPass = PassOptimiser.bake_defines(pass, activeKeywords, settings);
+                }
                 optimisedPasses.Add(optimisedPass);
             }
             shaderParts.Passes = optimisedPasses;
@@ -125,7 +122,7 @@ namespace Luka.Backlace.Premonition
             // And finally, we write our new masterpiece to a file.
             File.WriteAllText(lockedShaderPath, finalShaderCode);
             AssetDatabase.Refresh();
-            return LockedResult.Success;
+            return new CompactResultData { Result = CompactResult.Success, ShaderName = lockedShaderName, ShaderPath = lockedShaderPath };
         }
 
         // testing
@@ -140,7 +137,7 @@ namespace Luka.Backlace.Premonition
         {
             Material material = Selection.activeObject as Material;
             ProcessorSettings settings = new ProcessorSettings();
-            lock_material(material, settings);
+            compact_material(material, settings);
         }
     }
 
