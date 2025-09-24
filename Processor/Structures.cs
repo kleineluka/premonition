@@ -55,6 +55,7 @@ namespace Luka.Backlace.Premonition
         public bool hideShaderName = true;
         public bool trackErrors = true;
         public bool addMarker = true;
+        public bool addDebug = false;
         public bool skipMarked = true;
         public bool bakeDefines = true;
         public bool naiveGrabpassDetection = false;

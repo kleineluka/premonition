@@ -21,6 +21,7 @@ Using Premonition requires passing a `ProcessorSettings` object. This object con
 - `hideShaderName` - Whether to hide the shader name in the generated shader (ex. `Shader "Hidden/..."`).
 - `trackErrors` - Whether to add error tracking code to help debug issues.
 - `addMarker` - Whether to add a marker comment to the generated shader to indicate it was processed by Premonition.
+- `addDebug` - Whether to add a debug section to the generated shader with the Premonition settings used.
 - `skipMarked` - Whether to skip processing if the shader already has a Premonitions marker.
 - `naiveGrabpassDetection` - Whether to use a naive method for detecting GrabPasses (may over-hit but will catch more cases).
 - `customShaderName` - The custom name to use if `shaderNameType` is set to Custom.

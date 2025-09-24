@@ -71,23 +71,25 @@ namespace Luka.Backlace.Premonition
             commentBlockBuilder.AppendLine($"// Source Shader: {(sourceMaterial != null && sourceMaterial.shader != null ? sourceMaterial.shader.name : "Unknown")}");
             commentBlockBuilder.AppendLine($"// Generated On: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}");
             commentBlockBuilder.AppendLine($"// Premonition Version: {settings.VERSION}");
-            commentBlockBuilder.AppendLine("// Premonitions Settings:");
-            commentBlockBuilder.AppendLine($"// - addCompilerComments: {settings.addCompilerComments}");
-            commentBlockBuilder.AppendLine($"// - removeShaderComments: {settings.removeShaderComments}");
-            commentBlockBuilder.AppendLine($"// - optimizeWhitespace: {settings.optimizeWhitespace}");
-            commentBlockBuilder.AppendLine($"// - removeEmptyLines: {settings.removeEmptyLines}");
-            commentBlockBuilder.AppendLine($"// - removePropertyAttributes: {settings.removePropertyAttributes}");
-            commentBlockBuilder.AppendLine($"// - randomiseGrabpass: {settings.randomiseGrabpass}");
-            commentBlockBuilder.AppendLine($"// - hideShaderName: {settings.hideShaderName}");
-            commentBlockBuilder.AppendLine($"// - trackErrors: {settings.trackErrors}");
-            commentBlockBuilder.AppendLine($"// - addMarker: {settings.addMarker}");
-            commentBlockBuilder.AppendLine($"// - skipMarked: {settings.skipMarked}");
-            commentBlockBuilder.AppendLine($"// - naiveGrabpassDetection: {settings.naiveGrabpassDetection}");
-            commentBlockBuilder.AppendLine($"// - customShaderName: '{settings.customShaderName}'");
-            commentBlockBuilder.AppendLine($"// - compactShaderFolder: '{settings.compactShaderFolder}'");
-            commentBlockBuilder.AppendLine($"// - randomNameLength: {settings.randomNameLength}");
-            commentBlockBuilder.AppendLine($"// - ignoreIncludes: {(settings.ignoreIncludes.Count > 0 ? string.Join(", ", settings.ignoreIncludes) : "None")}");
-            commentBlockBuilder.AppendLine($"// - ignoreKeywords: {(settings.ignoreKeywords.Count > 0 ? string.Join(", ", settings.ignoreKeywords) : "None")}");
+            if (settings.addDebug) {
+                commentBlockBuilder.AppendLine("// Debugging On, Premonitions Settings:");
+                commentBlockBuilder.AppendLine($"// - addCompilerComments: {settings.addCompilerComments}");
+                commentBlockBuilder.AppendLine($"// - removeShaderComments: {settings.removeShaderComments}");
+                commentBlockBuilder.AppendLine($"// - optimizeWhitespace: {settings.optimizeWhitespace}");
+                commentBlockBuilder.AppendLine($"// - removeEmptyLines: {settings.removeEmptyLines}");
+                commentBlockBuilder.AppendLine($"// - removePropertyAttributes: {settings.removePropertyAttributes}");
+                commentBlockBuilder.AppendLine($"// - randomiseGrabpass: {settings.randomiseGrabpass}");
+                commentBlockBuilder.AppendLine($"// - hideShaderName: {settings.hideShaderName}");
+                commentBlockBuilder.AppendLine($"// - trackErrors: {settings.trackErrors}");
+                commentBlockBuilder.AppendLine($"// - addMarker: {settings.addMarker}");
+                commentBlockBuilder.AppendLine($"// - skipMarked: {settings.skipMarked}");
+                commentBlockBuilder.AppendLine($"// - naiveGrabpassDetection: {settings.naiveGrabpassDetection}");
+                commentBlockBuilder.AppendLine($"// - customShaderName: '{settings.customShaderName}'");
+                commentBlockBuilder.AppendLine($"// - compactShaderFolder: '{settings.compactShaderFolder}'");
+                commentBlockBuilder.AppendLine($"// - randomNameLength: {settings.randomNameLength}");
+                commentBlockBuilder.AppendLine($"// - ignoreIncludes: {(settings.ignoreIncludes.Count > 0 ? string.Join(", ", settings.ignoreIncludes) : "None")}");
+                commentBlockBuilder.AppendLine($"// - ignoreKeywords: {(settings.ignoreKeywords.Count > 0 ? string.Join(", ", settings.ignoreKeywords) : "None")}");
+            }
             commentBlockBuilder.AppendLine("// Baked-In Keywords:");
             if (activeKeywords != null && activeKeywords.Length > 0)
             {
