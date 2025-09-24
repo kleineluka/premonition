@@ -64,12 +64,31 @@ namespace Luka.Backlace.Premonition
         // add a comment block to the start of the shader with pre-processor info
         public static ShaderParts add_processor_info(ProcessorSettings settings, Material sourceMaterial, string[] activeKeywords, ShaderParts shaderParts)
         {
-            if (!settings.addCompilerComments || shaderParts == null) return shaderParts;
+            if (!settings.addMarker || shaderParts == null) return shaderParts;
             var commentBlockBuilder = new StringBuilder();
-            commentBlockBuilder.AppendLine("// ----------------------------------------");
-            commentBlockBuilder.AppendLine("// PREMONITIONS: Compact Material State");
+            commentBlockBuilder.AppendLine("// ------------- PREMONITIONS -------------");
             commentBlockBuilder.AppendLine($"// Source Material: {(sourceMaterial != null ? sourceMaterial.name : "Unknown")}");
-            commentBlockBuilder.AppendLine("// Active Keywords:");
+            commentBlockBuilder.AppendLine($"// Source Shader: {(sourceMaterial != null && sourceMaterial.shader != null ? sourceMaterial.shader.name : "Unknown")}");
+            commentBlockBuilder.AppendLine($"// Generated On: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}");
+            commentBlockBuilder.AppendLine($"// Premonition Version: {settings.VERSION}");
+            commentBlockBuilder.AppendLine("// Premonitions Settings:");
+            commentBlockBuilder.AppendLine($"// - addCompilerComments: {settings.addCompilerComments}");
+            commentBlockBuilder.AppendLine($"// - removeShaderComments: {settings.removeShaderComments}");
+            commentBlockBuilder.AppendLine($"// - optimizeWhitespace: {settings.optimizeWhitespace}");
+            commentBlockBuilder.AppendLine($"// - removeEmptyLines: {settings.removeEmptyLines}");
+            commentBlockBuilder.AppendLine($"// - removePropertyAttributes: {settings.removePropertyAttributes}");
+            commentBlockBuilder.AppendLine($"// - randomiseGrabpass: {settings.randomiseGrabpass}");
+            commentBlockBuilder.AppendLine($"// - hideShaderName: {settings.hideShaderName}");
+            commentBlockBuilder.AppendLine($"// - trackErrors: {settings.trackErrors}");
+            commentBlockBuilder.AppendLine($"// - addMarker: {settings.addMarker}");
+            commentBlockBuilder.AppendLine($"// - skipMarked: {settings.skipMarked}");
+            commentBlockBuilder.AppendLine($"// - naiveGrabpassDetection: {settings.naiveGrabpassDetection}");
+            commentBlockBuilder.AppendLine($"// - customShaderName: '{settings.customShaderName}'");
+            commentBlockBuilder.AppendLine($"// - compactShaderFolder: '{settings.compactShaderFolder}'");
+            commentBlockBuilder.AppendLine($"// - randomNameLength: {settings.randomNameLength}");
+            commentBlockBuilder.AppendLine($"// - ignoreIncludes: {(settings.ignoreIncludes.Count > 0 ? string.Join(", ", settings.ignoreIncludes) : "None")}");
+            commentBlockBuilder.AppendLine($"// - ignoreKeywords: {(settings.ignoreKeywords.Count > 0 ? string.Join(", ", settings.ignoreKeywords) : "None")}");
+            commentBlockBuilder.AppendLine("// Baked-In Keywords:");
             if (activeKeywords != null && activeKeywords.Length > 0)
             {
                 foreach (string keyword in activeKeywords)
@@ -79,12 +98,17 @@ namespace Luka.Backlace.Premonition
             }
             else
             {
-                commentBlockBuilder.AppendLine("// - None");
+                commentBlockBuilder.AppendLine("//  - None");
             }
-            commentBlockBuilder.AppendLine("// ----------------------------------------");
-            commentBlockBuilder.AppendLine();
+            commentBlockBuilder.AppendLine("// -----------------------------------------");
             shaderParts.PrePassContent = commentBlockBuilder.ToString() + shaderParts.PrePassContent;
             return shaderParts;
+        }
+
+        // check if the shader code has the premonitions marker
+        public static bool is_marked(string shaderCode)
+        {
+            return shaderCode.Contains("// ------------- PREMONITIONS -------------");
         }
     }
 
@@ -135,6 +159,92 @@ namespace Luka.Backlace.Premonition
         {
             return Regex.Replace(code, @"\[Space\((.*?)\)\]", string.Empty);
         }
+
+        // generate a random name for each GrabPass block in the shader code
+        public static string randomise_grabpass_names(string shaderCode, ProcessorSettings settings)
+        {
+            var nameMap = new Dictionary<string, string>();
+            int currentIndex = 0;
+
+            // First pass: find all GrabPass names and create a map of old->new names.
+            while (currentIndex < shaderCode.Length)
+            {
+                int grabPassIndex = shaderCode.IndexOf("GrabPass", currentIndex);
+                if (grabPassIndex == -1) break;
+
+                int openBraceIndex = shaderCode.IndexOf('{', grabPassIndex);
+                if (openBraceIndex == -1)
+                {
+                    currentIndex = grabPassIndex + "GrabPass".Length;
+                    continue;
+                }
+
+                int closeBraceIndex = ShaderParser.find_matching_brace(shaderCode, openBraceIndex);
+                if (closeBraceIndex == -1)
+                {
+                    currentIndex = openBraceIndex + 1;
+                    continue;
+                }
+
+                string grabPassBlock = shaderCode.Substring(grabPassIndex, closeBraceIndex - grabPassIndex + 1);
+                string blockContent = grabPassBlock.Substring(grabPassBlock.IndexOf('{') + 1, grabPassBlock.LastIndexOf('}') - grabPassBlock.IndexOf('{') - 1);
+
+                string contentWithoutTags = blockContent;
+                int tagsIndex = contentWithoutTags.IndexOf("Tags");
+                if (tagsIndex != -1)
+                {
+                    int tagsOpenBrace = contentWithoutTags.IndexOf('{', tagsIndex);
+                    if (tagsOpenBrace != -1)
+                    {
+                        int tagsCloseBrace = ShaderParser.find_matching_brace(contentWithoutTags, tagsOpenBrace);
+                        if (tagsCloseBrace != -1)
+                        {
+                            contentWithoutTags = contentWithoutTags.Remove(tagsIndex, tagsCloseBrace - tagsIndex + 1);
+                        }
+                    }
+                }
+
+                var nameMatch = System.Text.RegularExpressions.Regex.Match(contentWithoutTags, @"""([^""]+)""");
+                if (nameMatch.Success)
+                {
+                    string oldName = nameMatch.Groups[1].Value;
+                    if (!nameMap.ContainsKey(oldName))
+                    {
+                        string newName = Naming.get_random_name(settings.randomNameLength).Replace("_Locked_", "GP_");
+                        nameMap[oldName] = newName;
+                    }
+                }
+
+                currentIndex = closeBraceIndex + 1;
+            }
+
+            // Second pass: apply the name changes throughout the entire shader code.
+            string result = shaderCode;
+            foreach (var pair in nameMap)
+            {
+                string oldName = pair.Key;
+                string newName = pair.Value;
+                if (settings.naiveGrabpassDetection) {
+                    result = result.Replace(oldName, newName);
+                } else {
+                    result = Regex.Replace(result, $@"\b{Regex.Escape(oldName)}\b", newName);
+                    result = Regex.Replace(result, $@"\b{Regex.Escape(oldName)}_ST\b", newName + "_ST");
+                    result = Regex.Replace(result, $@"\b{Regex.Escape(oldName)}_TexelSize\b", newName + "_TexelSize");
+                }
+            }
+            return result;
+        }
+
+        // find the shader name and update it based on settings
+        public static string rename_shader(string shaderCode, string nameToAppend, bool hide)
+        {
+            return Regex.Replace(shaderCode, @"(Shader\s+"")([^""]+)""", (match) => {
+                string originalName = match.Groups[2].Value;
+                string newName = (hide ? "Hidden/" : "") + originalName + nameToAppend;
+                return $"{match.Groups[1].Value}{newName}\"";
+            });
+        }
+        
     }
 
 }

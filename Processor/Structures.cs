@@ -23,22 +23,22 @@ namespace Luka.Backlace.Premonition
     // settings to share between components of the pre-processor
     public class ProcessorSettings
     {
+        public const string VERSION = "1.0.0";
         public ShaderNameType shaderNameType = ShaderNameType.Timestamp;
         public bool addCompilerComments = true;
         public bool removeShaderComments = true;
-        public bool removeDeadFunctions = true;
-        public bool removeDeadVariables = true;
         public bool optimizeWhitespace = true;
         public bool removeEmptyLines = true;
         public bool removePropertyAttributes = true;
         public bool randomiseGrabpass = true;
         public bool hideShaderName = true;
         public bool trackErrors = true;
-        public bool addLockedMarker = true;
-        public bool preventReLocking = true;
+        public bool addMarker = true;
+        public bool skipMarked = true;
+        public bool naiveGrabpassDetection = false;
         public string customShaderName = "_CompactCustomNameExample";
         public string compactShaderFolder = "CompactShaders";
-        public int randomNameLength = 16;
+        public int randomNameLength = 8;
         public List<string> ignoreIncludes = new List<string>();
         public List<string> ignoreKeywords = new List<string>();
         public ProcessorSettings() 

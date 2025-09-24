@@ -17,7 +17,7 @@ namespace Luka.Backlace.Premonition
     {
 
         // find the matching closing brace for a given opening brace index
-        private static int find_matching_brace(string code, int startIndex)
+        public static int find_matching_brace(string code, int startIndex)
         {
             if (startIndex < 0 || code[startIndex] != '{') return -1;
 
