@@ -8,7 +8,7 @@ using System.IO;
 using System.Text;
 using System.Collections.Generic;
 
-// Structures.cs contains shared data structures for the pre-processor
+// Structs.cs contains shared data structures for the pre-processor
 namespace Luka.Example.Premonition
 {
 
