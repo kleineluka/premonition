@@ -9,7 +9,7 @@ using System.Text;
 using System.Collections.Generic;
 
 // Premonition.cs is the main entry point for the pre-processor
-namespace Luka.Backlace.Premonition
+namespace Luka.Example.Premonition
 {
 
     public static class Processor
