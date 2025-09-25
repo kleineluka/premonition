@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 // Helpers.cs contains utility functions for the pre-processor
-namespace Luka.Backlace.Premonition
+namespace Luka.Example.Premonition
 {
 
     // functions for generating shader names based on different naming schemes
@@ -167,30 +167,25 @@ namespace Luka.Backlace.Premonition
         {
             var nameMap = new Dictionary<string, string>();
             int currentIndex = 0;
-
-            // First pass: find all GrabPass names and create a map of old->new names.
+            // first pass: find all GrabPass names and create a map of old->new names.
             while (currentIndex < shaderCode.Length)
             {
                 int grabPassIndex = shaderCode.IndexOf("GrabPass", currentIndex);
                 if (grabPassIndex == -1) break;
-
                 int openBraceIndex = shaderCode.IndexOf('{', grabPassIndex);
                 if (openBraceIndex == -1)
                 {
                     currentIndex = grabPassIndex + "GrabPass".Length;
                     continue;
                 }
-
                 int closeBraceIndex = ShaderParser.find_matching_brace(shaderCode, openBraceIndex);
                 if (closeBraceIndex == -1)
                 {
                     currentIndex = openBraceIndex + 1;
                     continue;
                 }
-
                 string grabPassBlock = shaderCode.Substring(grabPassIndex, closeBraceIndex - grabPassIndex + 1);
                 string blockContent = grabPassBlock.Substring(grabPassBlock.IndexOf('{') + 1, grabPassBlock.LastIndexOf('}') - grabPassBlock.IndexOf('{') - 1);
-
                 string contentWithoutTags = blockContent;
                 int tagsIndex = contentWithoutTags.IndexOf("Tags");
                 if (tagsIndex != -1)
@@ -205,7 +200,6 @@ namespace Luka.Backlace.Premonition
                         }
                     }
                 }
-
                 var nameMatch = System.Text.RegularExpressions.Regex.Match(contentWithoutTags, @"""([^""]+)""");
                 if (nameMatch.Success)
                 {
@@ -216,11 +210,9 @@ namespace Luka.Backlace.Premonition
                         nameMap[oldName] = newName;
                     }
                 }
-
                 currentIndex = closeBraceIndex + 1;
             }
-
-            // Second pass: apply the name changes throughout the entire shader code.
+            // second pass: apply the name changes throughout the entire shader code.
             string result = shaderCode;
             foreach (var pair in nameMap)
             {

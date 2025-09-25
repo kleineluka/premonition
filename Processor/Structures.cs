@@ -9,7 +9,7 @@ using System.Text;
 using System.Collections.Generic;
 
 // Structures.cs contains shared data structures for the pre-processor
-namespace Luka.Backlace.Premonition
+namespace Luka.Example.Premonition
 {
 
     // using premonition processor will return this object

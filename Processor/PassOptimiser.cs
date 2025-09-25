@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 // PassOptimiser.cs contains functions to optimise individual shader passes (ex. removing unused keywords)
-namespace Luka.Backlace.Premonition
+namespace Luka.Example.Premonition
 {
     public static class PassOptimiser
     {

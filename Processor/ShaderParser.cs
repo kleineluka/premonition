@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 // ShaderParser.cs contains functions to parse shader code into parts (pre-pass, pass, post-pass)
-namespace Luka.Backlace.Premonition
+namespace Luka.Example.Premonition
 {
 
     public static class ShaderParser

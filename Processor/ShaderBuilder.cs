@@ -9,7 +9,7 @@ using System.Text;
 using System.Collections.Generic;
 
 // ShaderBuilder.cs takes a shader and adds all its includes inline
-namespace Luka.Backlace.Premonition
+namespace Luka.Example.Premonition
 {
 
     public static class ShaderBuilder 

@@ -32,7 +32,7 @@ Using Premonition requires passing a `ProcessorSettings` object. This object con
 
 ## Adding to Your Shader 🪄
 
-Add the `Processor` folder into wherever your shader editor is. In the namespace of the scripts of the project, replace <x.Premonition> with whatever your namespace is. You can then call the `Premonition.Processor.compact_material` function, passing in the material you want to process and a `ProcessorSettings` object with your desired settings.
+Add the `Processor` folder into wherever your shader editor is. In the namespace of the scripts of the project, replace `Luka.Example.Premonition` with whatever your namespace is, so for example, it could be `MyProject.Premonition`. You can then call the `Premonition.Processor.compact_material` function, passing in the material you want to process and a `ProcessorSettings` object with your desired settings.
 
 ## Return Values 🌠
 
