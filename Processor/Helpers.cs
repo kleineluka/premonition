@@ -27,14 +27,14 @@ namespace Luka.Example.Premonition
             {
                 stringBuilder.Append(chars[random.Next(chars.Length)]);
             }
-            return "_Locked_" + stringBuilder.ToString();
+            return "_Compact_" + stringBuilder.ToString();
         }
 
         // generate a simple name based on the current unix timestamp
         public static string get_timestamp_name()
         {
             long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            return "_Locked_" + timestamp.ToString();
+            return "_Compact_" + timestamp.ToString();
         }
 
         // get the locked shader name based on the selected naming scheme
@@ -44,7 +44,7 @@ namespace Luka.Example.Premonition
             switch (shaderNameType)
             {
                 case ShaderNameType.Custom:
-                    lockedShaderName = customShaderName;
+                    lockedShaderName = "_Compact_" + customShaderName;
                     break;
                 case ShaderNameType.Random:
                     lockedShaderName = get_random_name(randomNameLength);
