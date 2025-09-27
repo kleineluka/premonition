@@ -112,6 +112,30 @@ namespace Luka.Example.Premonition
         {
             return shaderCode.Contains("// ------------- PREMONITIONS -------------");
         }
+
+        // take a source material and extract the commented source shader 
+        public static string extract_source_shader(Material sourceMaterial)
+        {
+            if (sourceMaterial == null || sourceMaterial.shader == null) return "Unknown";
+            string shaderCode = AssetDatabase.GetTextMetaFilePathFromAssetPath(AssetDatabase.GetAssetPath(sourceMaterial.shader));
+            if (string.IsNullOrEmpty(shaderCode)) return "Unknown";
+            try
+            {
+                string[] lines = File.ReadAllLines(shaderCode);
+                foreach (string line in lines)
+                {
+                    if (line.StartsWith("// Source Shader: "))
+                    {
+                        return line.Substring("// Source Shader: ".Length).Trim();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[Premonitions] Failed to read shader file for material '{sourceMaterial.name}': {e.Message}");
+            }
+            return "Unknown";
+        }
     }
 
     // WARNING: regex heavy..........
